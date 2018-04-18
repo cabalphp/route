@@ -89,8 +89,10 @@ class RouteCollection
 
     public function loop(RequestInterface $request, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
     {
+        $options = $this->mergeOptions($parentOptions);
+
         foreach ($this->routes as $route) {
-            $route->loop($request, $routeCollector, $parentOptions);
+            $route->loop($request, $routeCollector, $options);
         }
     }
 }
