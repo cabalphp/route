@@ -24,6 +24,18 @@ trait MapTrait
      * @param string|mixed $hander
      * @return \Cabal\Route\Route
      */
+    public function ws($path, $hander)
+    {
+        return $this->map('WS', $path, $hander);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $path
+     * @param string|mixed $hander
+     * @return \Cabal\Route\Route
+     */
     public function post($path, $hander)
     {
         return $this->map('POST', $path, $hander);
