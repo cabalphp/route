@@ -3,6 +3,14 @@ namespace Cabal\Route;
 
 trait MapTrait
 {
+    /**
+     * Undocumented function
+     *
+     * @param string $optionsOrMethod
+     * @param string|mixed $path
+     * @param \Cabal\Route\Route $handler
+     * @return void
+     */
     abstract public function map($optionsOrMethod, $path, $handler);
 
     /**

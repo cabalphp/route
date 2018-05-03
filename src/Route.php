@@ -37,20 +37,20 @@ class Route
     }
 
 
-    public function loop(RequestInterface $request, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
+    public function loop(RequestInterface $request = null, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
     {
         $options = $this->mergeOptions($parentOptions);
 
-        if ($options['scheme'] && !in_array($request->getUri()->getScheme(), (array)$options['scheme'])) {
+        if ($request && $options['scheme'] && !in_array($request->getUri()->getScheme(), (array)$options['scheme'])) {
             return;
         }
-        if ($options['host'] && !in_array($request->getUri()->getHost(), (array)$options['host'])) {
+        if ($request && $options['host'] && !in_array($request->getUri()->getHost(), (array)$options['host'])) {
             return;
         }
 
         $handler = $this->handler;
         if (is_string($handler)) {
-            $handler = "{$options['namespace']}\\{$this->handler}";
+            $handler = $options['namespace'] ? "\\{$options['namespace']}\\{$this->handler}" : "\\{$this->handler}";
         }
         $path = '/' . ltrim("{$options['basePath']}/", '/') . trim($this->path, '/');
 

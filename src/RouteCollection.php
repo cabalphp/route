@@ -42,8 +42,8 @@ class RouteCollection
      *
      * @param string $optionsOrMethod
      * @param string|mixed $path
-     * @param \Cabal\Route\Route $handler
-     * @return void
+     * @param string|mixed $handler
+     * @return \Cabal\Route\Route
      */
     public function map($optionsOrMethod, $path, $handler)
     {
@@ -87,7 +87,27 @@ class RouteCollection
         return $result;
     }
 
-    public function loop(RequestInterface $request, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
+
+    public function simpleDispatch($method, $uri)
+    {
+        if (!isset($this->cached['_SIMPLE_'])) {
+            $routeCollector = new \FastRoute\RouteCollector(
+                new \FastRoute\RouteParser\Std,
+                new \FastRoute\DataGenerator\GroupCountBased()
+            );
+            $this->loop(null, $routeCollector, $this->options);
+            $this->cached['_SIMPLE_'] = $routeCollector->getData();
+        }
+        $dispatcher = new \FastRoute\Dispatcher\GroupCountBased($this->cached['_SIMPLE_']);
+
+        $result = $dispatcher->dispatch($method, $uri);
+        while (count($result) < 3) {
+            $result[] = null;
+        }
+        return $result;
+    }
+
+    public function loop(RequestInterface $request = null, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
     {
         $options = $this->mergeOptions($parentOptions);
 
