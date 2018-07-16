@@ -87,6 +87,18 @@ class RouteCollection
         return $result;
     }
 
+    public function getRoutesRaw()
+    {
+        $id = '_RAW_';
+        $routeCollector = new RawRouteCollector(
+            new \FastRoute\RouteParser\Std,
+            new \FastRoute\DataGenerator\GroupCountBased()
+        );
+
+        $this->loop(null, $routeCollector, $this->options);
+        $this->cached[$id] = $routeCollector->getData();
+        return $this->cached[$id];
+    }
 
     public function simpleDispatch($method, $uri)
     {
