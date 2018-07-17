@@ -17,107 +17,107 @@ trait MapTrait
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function get($path, $hander)
+    public function get($path, $handler)
     {
-        return $this->map('GET', $path, $hander);
+        return $this->map('GET', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function ws($path, $hander)
+    public function ws($path, $handler)
     {
-        return $this->map('WS', $path, $hander);
+        return $this->map('WS', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function post($path, $hander)
+    public function post($path, $handler)
     {
-        return $this->map('POST', $path, $hander);
+        return $this->map('POST', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function put($path, $hander)
+    public function put($path, $handler)
     {
-        return $this->map('PUT', $path, $hander);
+        return $this->map('PUT', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function patch($path, $hander)
+    public function patch($path, $handler)
     {
-        return $this->map('PATCH', $path, $hander);
+        return $this->map('PATCH', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function delete($path, $hander)
+    public function delete($path, $handler)
     {
-        return $this->map('DELETE', $path, $hander);
+        return $this->map('DELETE', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function head($path, $hander)
+    public function head($path, $handler)
     {
-        return $this->map('HEAD', $path, $hander);
+        return $this->map('HEAD', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function options($path, $hander)
+    public function options($path, $handler)
     {
-        return $this->map('OPTIONS', $path, $hander);
+        return $this->map('OPTIONS', $path, $handler);
     }
 
     /**
      * Undocumented function
      *
      * @param string $path
-     * @param string|mixed $hander
+     * @param string|mixed $handler
      * @return \Cabal\Route\Route
      */
-    public function any($path, $hander)
+    public function any($path, $handler)
     {
-        return $this->map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], $path, $hander);
+        return $this->map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], $path, $handler);
     }
 }
