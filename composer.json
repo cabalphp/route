@@ -15,7 +15,7 @@
     },
     "require": {
         "php": "^7.0.0",
-        "ext-swoole": "^2.0.0",
+        "ext-swoole": ">=2.2.0",
         "psr/http-message": "^1.0",
         "nikic/fast-route": "1.*",
         "zendframework/zend-diactoros": "^1.7"
