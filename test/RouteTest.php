@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Cabal\Route\RouteCollection;
 use Zend\Diactoros\ServerRequest;
+use Cabal\Route\UrlBuilder;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -14,6 +15,51 @@ class RouteTest extends TestCase
     static $route;
 
 
+    public function testUrlBuilder()
+    {
+        $route = new RouteCollection();
+        $route->get('/get', 'DefaultController@get')->name('get');
+        $route->post('/post', 'DefaultController@post')->name('post');
+        $route->get('/var/{id}', 'DefaultController@var')->name('var');
+        $route->get('/list[/{id}[/{page:\d+}][/{name}]]', 'DefaultController@var')->name('page_name');
+        $route->get('/list[/{id}[/{page:\d+}].html]', 'DefaultController@var')->name('page');
+
+        $urlBuilder = new UrlBuilder($route, 'page', 'www.cabalphp.com', 'http', [
+            'id' => 'test', 'page' => 888,
+        ]);
+        $this->assertEquals(
+            $urlBuilder->route('get'),
+            '/get'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('post'),
+            '/post'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('var', ['id' => 1]),
+            '/var/1'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('page', ['id' => 'cabal']),
+            '/list/cabal'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('page_name', ['id' => 'cabal', 'page' => 2, 'name' => 'name']),
+            '/list/cabal/2/name'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('page_name', ['id' => 'cabal', 'name' => 'name']),
+            '/list/cabal?name=name'
+        );
+        $this->assertEquals(
+            $urlBuilder->route('page', ['id' => 'xxx', 'page' => 1], ['scheme' => 'https', 'full' => true]),
+            'https://www.cabalphp.com/list/xxx/1.html'
+        );
+        $this->assertEquals(
+            $urlBuilder->cover(['page' => 666], 1),
+            '/list/test/666.html'
+        );
+    }
     public function testNamedsRoutes()
     {
         $route = new RouteCollection();
