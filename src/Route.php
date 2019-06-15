@@ -12,12 +12,18 @@ class Route
     const METHOD_NOT_ALLOWED = \FastRoute\Dispatcher::METHOD_NOT_ALLOWED;
     const FOUND = \FastRoute\Dispatcher::FOUND;
 
+    /**
+     * @var \Cabal\Route\RouteCollection
+     */
+    protected $collection;
+
     protected $path;
 
     protected $handler;
 
-    function __construct()
+    function __construct($collection)
     {
+        $this->collection = $collection;
     }
 
     /**
@@ -33,9 +39,11 @@ class Route
         $this->options = $this->defaultOptions($optionsOrMethod);
         $this->path = $path;
         $this->handler = $handler;
+        if (isset($this->options['name']) && $this->options['name']) {
+            $this->collection->occupyName($this->options['name']);
+        }
         return $this;
     }
-
 
     public function loop(RequestInterface $request = null, \FastRoute\RouteCollector $routeCollector, $parentOptions = '')
     {
@@ -47,7 +55,6 @@ class Route
         if ($request && $options['host'] && !in_array($request->getUri()->getHost(), (array)$options['host'])) {
             return;
         }
-
         $handler = $this->handler;
         if (is_string($handler)) {
             $handler = $options['namespace'] ? "\\{$options['namespace']}\\{$this->handler}" : "\\{$this->handler}";
@@ -60,6 +67,7 @@ class Route
             [
                 'handler' => $handler,
                 'middleware' => $options['middleware'],
+                'options' => array_intersect_key(array_filter($options), array_flip(['name', 'host', 'scheme'])),
             ]
         );
     }

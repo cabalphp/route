@@ -17,9 +17,19 @@ class RouteCollection
      */
     protected $routes = [];
 
-    function __construct($optionsOrMethod = '')
+    /**
+     * @var \Cabal\Route\RouteCollection
+     */
+    protected $root;
+
+    protected $routeMap = [];
+
+    function __construct($optionsOrMethod = '', $root = null)
     {
         $this->options = $optionsOrMethod;
+        if ($root) {
+            $this->root  = $root;
+        }
     }
 
     /**
@@ -31,10 +41,22 @@ class RouteCollection
      */
     public function group($optionsOrMethod, $callback)
     {
-        $collection = new RouteCollection($optionsOrMethod);
+        $collection = new RouteCollection($optionsOrMethod, $this);
         $this->routes[] = $collection;
         $callback($collection);
         return $collection;
+    }
+
+    public function occupyName($name)
+    {
+        if ($this->root) {
+            $this->root->occupyName($name);
+        } else {
+            if (isset($this->routeMap[$name])) {
+                throw new \Exception("route name '{$name}' must be unique.");
+            }
+            $this->routeMap[$name] = 1;
+        }
     }
 
     /**
@@ -47,17 +69,10 @@ class RouteCollection
      */
     public function map($optionsOrMethod, $path, $handler)
     {
-        $route = new Route();
+        $route = new Route($this);
         $route->map($optionsOrMethod, $path, $handler);
         $this->routes[] = $route;
         return $route;
-    }
-
-    public function __call($method, $params)
-    {
-        $route = new Route();
-        $this->routes[] = $route;
-        $route->$method(...$params);
     }
 
     public function getDispatcher(RequestInterface $request)
@@ -87,6 +102,10 @@ class RouteCollection
         return $result;
     }
 
+    /**
+     * 
+     * @return \Cabal\Route\RawRouteCollector
+     */
     public function getRoutesRaw()
     {
         $id = '_RAW_';
@@ -97,6 +116,22 @@ class RouteCollection
 
         $this->loop(null, $routeCollector, $this->options);
         $this->cached[$id] = $routeCollector->getData();
+        return $this->cached[$id];
+    }
+    public function getNamedRoute($name = null)
+    {
+        $id = '_NAMEDS_';
+        $routeCollector = new RawRouteCollector(
+            new \FastRoute\RouteParser\Std,
+            new \FastRoute\DataGenerator\GroupCountBased()
+        );
+
+        $this->loop(null, $routeCollector, $this->options);
+        $this->cached[$id] = $routeCollector->getNameds();
+
+        if ($name) {
+            return $this->cached[$id][$name] ?? false;
+        }
         return $this->cached[$id];
     }
 

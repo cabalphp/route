@@ -13,10 +13,60 @@ class RouteTest extends TestCase
      */
     static $route;
 
-    public static function setUpBeforeClass()
-    {
-    }
 
+    public function testNamedsRoutes()
+    {
+        $route = new RouteCollection();
+        $route->map('GET', '/', 'DefaultController@getIndex');
+        $route->get('/get', 'DefaultController@get');
+        $route->post('/post', 'DefaultController@post');
+        $route->get('/var/{id}', 'DefaultController@var')->name('test1');
+
+        $exceptions = [];
+        $route->group([
+            'host' => '',
+            'method' => 'GET',
+            'scheme' => 'https',
+            'basePath' => '/https',
+            'namespace' => 'App\\Controller',
+            'middleware' => ['httpsMiddleware'],
+        ], function ($route) use (&$exceptions) {
+            $route->map([], '/index', 'HttpsController@getIndex');
+            $route->map([], '/index2', 'HttpsController@getIndex2')->name('test2');
+
+            $route->group([
+                'basePath' => '/group',
+            ], function ($route) use (&$exceptions) {
+                $route->map([], '/deep', 'HttpsController@deep');
+                $route->map([], '/deep2/{a}/{name:[^/]+}', 'HttpsController@deep2')->name('test3');
+                try {
+                    $route->map([], '/deep3', 'HttpsController@deep3')->name('test3');
+                } catch (\Exception $ex) {
+                    $exceptions[] = $ex;
+                }
+            });
+            $route->group([
+                'basePath' => '/group2',
+            ], function ($route) use (&$exceptions) {
+
+                try {
+                    $route->map([], '/deep3', 'HttpsController@deep3')->name('test1');
+                } catch (\Exception $ex) {
+                    $exceptions[] = $ex;
+                }
+            });
+        });
+
+        $nameds = $route->getNamedRoute();
+        $test = $route->getNamedRoute('test2');
+
+
+        $this->assertEquals(count($exceptions), 2);
+        $this->assertEquals(isset($nameds['test1']), true);
+        $this->assertEquals(isset($nameds['test2']), true);
+        $this->assertEquals(isset($nameds['test3']), true);
+        $this->assertEquals($test[1], '/https/index2');
+    }
     public function testRequestDispatch()
     {
         $route = new RouteCollection();
@@ -56,13 +106,12 @@ class RouteTest extends TestCase
             list($scheme, $host, $path, $method, $rightHandler, $rightMiddleware, $rightVars) = $request;
             $request = $this->newRequest($scheme, $host, $path, $method);
             list($code, $handler, $vars) = $route->dispatch($request);
-            $vars = $vars ? : [];
+            $vars = $vars ?: [];
 
             $this->assertEquals(isset($handler['handler']) ? $handler['handler'] : null, $rightHandler);
             $this->assertEquals(isset($handler['middleware']) ? json_encode($handler['middleware']) : '[]', json_encode($rightMiddleware));
             $this->assertEquals(json_encode($vars), json_encode($rightVars));
         }
-
     }
 
     public function testSimpleRequestDispatch()
@@ -95,13 +144,12 @@ class RouteTest extends TestCase
         ] as $request) {
             list($path, $method, $rightHandler, $rightMiddleware, $rightVars) = $request;
             list($code, $handler, $vars) = $route->simpleDispatch($method, $path);
-            $vars = $vars ? : [];
+            $vars = $vars ?: [];
 
             $this->assertEquals(isset($handler['handler']) ? $handler['handler'] : null, $rightHandler);
             $this->assertEquals(isset($handler['middleware']) ? json_encode($handler['middleware']) : '[]', json_encode($rightMiddleware));
             $this->assertEquals(json_encode($vars), json_encode($rightVars));
         }
-
     }
 
     protected function newRequest($scheme, $host, $path, $method = 'GET')
