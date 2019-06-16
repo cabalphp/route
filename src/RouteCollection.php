@@ -97,7 +97,7 @@ class RouteCollection
         $dispatcher = $this->getDispatcher($request);
         $result = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
         while (count($result) < 3) {
-            $result[] = null;
+            $result[] = [];
         }
         return $result;
     }
