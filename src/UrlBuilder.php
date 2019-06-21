@@ -120,9 +120,9 @@ REGEX;
         }
     }
 
-    public function cover($params = [])
+    public function cover($params = [], $route = null)
     {
         $params = array_merge($this->currentInfo['params'], $params);
-        return $this->route($this->currentRouteName, $params);
+        return $this->route($route ?: $this->currentRouteName, $params);
     }
 }
